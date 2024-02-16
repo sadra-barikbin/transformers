@@ -557,6 +557,10 @@ GPT2_INPUTS_DOCSTRING = r"""
             Contains precomputed hidden-states (key and values in the attention blocks) as computed by the model (see
             `past_key_values` output below). Can be used to speed up sequential decoding. The `input_ids` which have
             their past given to this model should not be passed as `input_ids` as they have already been computed.
+
+            Each element of `past_key_values` is a tuple (past_key, past_value):
+            - past_key: [batch_size, num_heads, past_length, head_dim]
+            - past_value: [batch_size, num_heads, past_length, head_dim]
         attention_mask (`torch.FloatTensor` of shape `(batch_size, sequence_length)`, *optional*):
             Mask to avoid performing attention on padding token indices. Mask values selected in `[0, 1]`:
 
@@ -565,7 +569,7 @@ GPT2_INPUTS_DOCSTRING = r"""
 
             If `past_key_values` is used, `attention_mask` needs to contain the masking strategy that was used for
             `past_key_values`. In other words, the `attention_mask` always has to have the length:
-            `len(past_key_values) + len(input_ids)`
+            `past_length + input_ids_length`
 
             [What are attention masks?](../glossary#attention-mask)
         token_type_ids (`torch.LongTensor` of shape `(batch_size, input_ids_length)`, *optional*):
