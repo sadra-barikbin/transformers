@@ -796,7 +796,6 @@ class Trainer:
     def _remove_unused_columns(self, dataset: "datasets.Dataset", description: Optional[str] = None):
         if not self.args.remove_unused_columns:
             return dataset
-        self._set_signature_columns_if_needed()
         signature_columns = self._signature_columns
 
         ignored_columns = list(set(dataset.column_names) - set(signature_columns))
@@ -831,7 +830,6 @@ class Trainer:
         """Wrap the data collator in a callable removing unused columns."""
         if not self.args.remove_unused_columns:
             return data_collator
-        self._set_signature_columns_if_needed()
         signature_columns = self._signature_columns
 
         remove_columns_collator = RemoveColumnsCollator(
@@ -882,6 +880,7 @@ class Trainer:
 
         train_dataset = self.train_dataset
         data_collator = self.data_collator
+        self._set_signature_columns_if_needed()
         if is_datasets_available() and isinstance(train_dataset, datasets.Dataset):
             train_dataset = self._remove_unused_columns(train_dataset, description="training")
         else:
@@ -3250,6 +3249,8 @@ class Trainer:
         Prepare `inputs` before feeding them to the model, converting them to tensors if they are not already and
         handling potential state.
         """
+        self._set_signature_columns_if_needed()
+        inputs = {k: inputs[k] for k in self._signature_columns if k in inputs}
         inputs = self._prepare_input(inputs)
         if len(inputs) == 0:
             raise ValueError(
